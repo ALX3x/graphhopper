@@ -248,6 +248,7 @@
                     <linkXRef>false</linkXRef>
                 </configuration>
             </plugin>
+            <!-- pitest added with maven for mutation-->
 
             <plugin>
                 <groupId>de.thetaphi</groupId>
