@@ -25,6 +25,8 @@ import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
 import org.junit.jupiter.api.Test;
+import com.github.javafaker.Faker;
+import java.util.Random; 
 
 import java.util.List;
 
@@ -236,4 +238,38 @@ public class GHUtilityTest {
         AssertionError err = assertThrows(AssertionError.class, () -> fail("boom"));
         assertEquals("boom", err.getMessage(), "fail(message) doit relancer un AssertionError avec le message passé");
     }
+    /**
+ * Génération pseudo-aléatoire (déterministe) de coordonnées avec JavaFaker.
+ *
+ * But :
+ *  - Vérifier que pour un petit graphe dont les nœuds ont des lat/lon réalistes, aucune
+ *    alerte n’est remontée par GHUtility.getProblems.
+ *  - Utiliser JavaFaker pour rapprocher le test de données "du monde réel", tout en
+ *    restant reproductible (seed fixée).
+ *
+ * Détails :
+ *  - Faker.address().latitude()/longitude() renvoient des chaînes dans les bornes [-90,90], [-180,180].
+ *  - On parse en double et on pose 5 nœuds. On connecte une petite chaîne d’arêtes.
+ *  - Seed = 12345 pour la reproductibilité.
+ */
+    @Test
+    public void getProblems_randomValidLatLon_withFaker_returnsEmpty() {
+        BaseGraph g = newEmptyGraph();
+        NodeAccess na = g.getNodeAccess();
+        Faker faker = new Faker(new Random(12345)); // seed fixe → test stable
+
+        final int N = 5;
+        for (int i = 0; i < N; i++) {
+            double lat = Double.parseDouble(faker.address().latitude());
+            double lon = Double.parseDouble(faker.address().longitude());
+            na.setNode(i, lat, lon);
+        }
+        for (int i = 0; i < N - 1; i++) g.edge(i, i + 1).setDistance(100 + i * 10);
+
+        List<String> problems = GHUtility.getProblems(g);
+        assertNotNull(problems);
+        assertTrue(problems.isEmpty(), "Aucun problème attendu avec des coordonnées Faker valides");
+    }
+
+
 }
