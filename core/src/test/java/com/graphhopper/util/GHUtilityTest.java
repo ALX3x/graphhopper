@@ -32,6 +32,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Peter Karich
+ */
+
 public class GHUtilityTest {
 
     @Test
@@ -240,13 +244,11 @@ public class GHUtilityTest {
     }
     /**
  * Génération pseudo-aléatoire (déterministe) de coordonnées avec JavaFaker.
- *
  * But :
  *  - Vérifier que pour un petit graphe dont les nœuds ont des lat/lon réalistes, aucune
  *    alerte n’est remontée par GHUtility.getProblems.
  *  - Utiliser JavaFaker pour rapprocher le test de données "du monde réel", tout en
  *    restant reproductible (seed fixée).
- *
  * Détails :
  *  - Faker.address().latitude()/longitude() renvoient des chaînes dans les bornes [-90,90], [-180,180].
  *  - On parse en double et on pose 5 nœuds. On connecte une petite chaîne d’arêtes.
